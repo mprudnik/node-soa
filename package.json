@@ -7,6 +7,7 @@
   "scripts": {
     "check": "npx tsc --project .",
     "start": "node main.js",
+    "build": "prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,7 +23,11 @@
   "engines": {
     "node": "18"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@fastify/cors": "^8.2.0",
+    "@prisma/client": "^4.7.1",
+    "fastify": "^4.10.2"
+  },
   "devDependencies": {
     "@types/node": "^18.7.8",
     "@types/ws": "^8.5.3",
@@ -33,6 +38,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "metatests": "^0.8.2",
     "prettier": "^2.7.1",
+    "prisma": "^4.7.1",
     "typescript": "^4.7.4"
   }
 }
