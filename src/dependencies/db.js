@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
-module.exports = async (options, logger) => {
+export default async (options, logger) => {
   const prisma = new PrismaClient(options);
 
   await prisma.$connect();

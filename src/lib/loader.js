@@ -88,7 +88,7 @@ export const deps = async (logger, depsPath, options) => {
     if (file.isDirectory()) continue;
 
     const [dependencyName] = fileName.split('.');
-    const loadDependency = require(filePath);
+    const { default: loadDependency } = await import(filePath);
     dependencies[dependencyName] = await loadDependency(
       options[dependencyName] ?? {},
       logger,
