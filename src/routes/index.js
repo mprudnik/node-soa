@@ -1,3 +1,3 @@
-const auth = require('./auth');
+import auth from './auth.js';
 
-module.exports = { auth };
+export default { auth };

@@ -1,8 +1,6 @@
-'use strict';
+import { pino } from 'pino';
 
-const { pino } = require('pino');
-
-module.exports.options = (extendWith = {}) => ({
+export const options = (extendWith = {}) => ({
   level: 'debug',
   transport: {
     target: 'pino-pretty',
@@ -13,4 +11,4 @@ module.exports.options = (extendWith = {}) => ({
   ...extendWith,
 });
 
-module.exports.init = (options) => pino(options);
+export const init = (options) => pino(options);

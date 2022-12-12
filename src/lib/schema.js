@@ -1,4 +1,4 @@
-module.exports.toObject = ({ required = [], properties }) => ({
+export const toObject = ({ required = [], properties }) => ({
   type: 'object',
   additionalProperties: false,
   required,

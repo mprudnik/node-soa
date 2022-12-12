@@ -1,9 +1,9 @@
-const crypto = require('node:crypto');
+import crypto from 'node:crypto';
 
 const SALT_LENGTH = 15;
 const KEY_LENGTH = 64;
 
-module.exports.hash = (password) =>
+export const hash = (password) =>
   new Promise((resolve, reject) => {
     const salt = crypto.randomBytes(SALT_LENGTH).toString('base64');
     crypto.scrypt(password, salt, KEY_LENGTH, (err, result) => {
@@ -12,7 +12,7 @@ module.exports.hash = (password) =>
     });
   });
 
-module.exports.compare = (password, hash) =>
+export const compare = (password, hash) =>
   new Promise((resolve, reject) => {
     const [salt, hashedPassword] = hash.split(':');
     crypto.scrypt(password, salt, KEY_LENGTH, (err, derivedKey) => {
@@ -21,5 +21,5 @@ module.exports.compare = (password, hash) =>
     });
   });
 
-module.exports.random = (length = 36) =>
+export const random = (length = 36) =>
   crypto.randomBytes(length).toString('base64');

@@ -1,4 +1,4 @@
-const db = require('./db');
-const logger = require('./logger');
+import * as db from './db.js';
+import * as logger from './logger.js';
 
-module.exports = { db, logger };
+export default { db, logger };

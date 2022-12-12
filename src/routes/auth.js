@@ -1,8 +1,8 @@
-const crypto = require('../lib/crypto');
-const schema = require('../lib/schema');
-const { AppError, handleError } = require('../lib/error');
+import * as crypto from '../lib/crypto.js';
+import * as schema from '../lib/schema.js';
+import { AppError, handleError } from '../lib/error.js';
 
-module.exports = function ({ db, logger }) {
+export default function ({ db, logger }) {
   return async (server) => {
     server.route({
       method: 'POST',
@@ -140,4 +140,4 @@ module.exports = function ({ db, logger }) {
       },
     });
   };
-};
+}

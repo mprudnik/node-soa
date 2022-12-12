@@ -1,21 +1,19 @@
-'use strict';
+import { PrismaClient } from '@prisma/client';
 
-const { PrismaClient } = require('@prisma/client');
-
-module.exports.options = (extendWith = {}) => ({
+export const options = (extendWith = {}) => ({
   log: ['info', 'query'],
   errorFormat: 'minimal',
   ...extendWith,
 });
 
-module.exports.init = async ({ logger }, options = {}) => {
+export const init = async ({ logger }, options = {}) => {
   const client = new PrismaClient(options);
   await client.$connect();
   logger.info('DB connected');
   return client;
 };
 
-module.exports.teardown = async ({ db, logger }) => {
+export const teardown = async ({ db, logger }) => {
   await db.$disconnect();
   logger.info('DB disconnected');
 };
