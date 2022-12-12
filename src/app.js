@@ -9,7 +9,7 @@ export default async () => {
   const deps = await load.deps(logger, config.depsPath, config.depsOptions);
 
   const sandbox = Object.freeze({
-    logger: Object.freeze(logger),
+    logger,
     entities,
     AppError,
     ...deps,

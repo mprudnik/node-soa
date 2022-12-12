@@ -117,5 +117,5 @@ export const start = async (logger, routing, options) => {
 };
 
 export const stop = async () => {
-  if (server) await server.stop();
+  if (server) await server.close();
 };
