@@ -12,13 +12,6 @@
     "dependencies": "readonly"
   },
   "rules": {
-    "strict": [
-      "error",
-      "never"
-    ],
-    "no-unused-expressions": [
-      "off"
-    ],
     "id-denylist": [
       "error",
       "entities",
