@@ -19,9 +19,8 @@ model User {
   createdAt    DateTime @default(now())
   udpatedAt    DateTime @updatedAt
 
-  sessions    Session[]
-  employments Employee[]
-  companies   Company[]
+  sessions Session[]
+  accounts Account[]
 }
 
 model Session {
@@ -34,65 +33,42 @@ model Session {
   userId String
 }
 
-model Company {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  domain      String   @unique
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Account {
+  id        String   @id @default(uuid())
+  balance   Float
+  currency  Currency
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  owner       User          @relation(fields: [ownerId], references: [id])
-  ownerId     String
-  employees   Employee[]
-  projects    Project[]
-  permissions Permissions[]
+  user            User          @relation(fields: [userId], references: [id])
+  userId          String
+  transactionsIn  Transaction[] @relation(name: "receiver")
+  transactionsOut Transaction[] @relation(name: "sender")
 }
 
-model Employee {
-  id        String       @id @default(uuid())
-  type      EmployeeType @default(Normal)
-  phone     String?
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+model Transaction {
+  id        String           @id @default(uuid())
+  amount    Float
+  currency  Currency
+  state     TransactionState @default(INITIAL)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 
-  user        User         @relation(fields: [userId], references: [id])
-  userId      String
-  company     Company      @relation(fields: [companyId], references: [id])
-  companyId   String
-  permissions Permissions?
-  projects    Project[]
+  from   Account @relation(name: "sender", fields: [fromId], references: [id])
+  fromId String
+  to     Account @relation(name: "receiver", fields: [toId], references: [id])
+  toId   String
 }
 
-model Permissions {
-  accessToCMS Boolean
-
-  company    Company  @relation(fields: [companyId], references: [id])
-  companyId  String
-  employee   Employee @relation(fields: [employeeId], references: [id])
-  employeeId String   @unique
-
-  @@id(fields: [companyId, employeeId])
+enum TransactionState {
+  INITIAL
+  DEBITED
+  COMPLETED
+  FAILED
 }
 
-model Project {
-  id          String    @id @default(uuid())
-  name        String
-  description String?
-  startDate   DateTime?
-  endDate     DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  company   Company    @relation(fields: [companyId], references: [id])
-  companyId String
-  members   Employee[]
-
-  @@unique([companyId, name])
-}
-
-enum EmployeeType {
-  Normal
-  Cooperation
-  Intern
+enum Currency {
+  USD
+  EUR
+  UAH
 }
