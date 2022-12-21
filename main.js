@@ -1,21 +1,13 @@
-import * as server from './src/server.js';
+import * as app from './src/app.js';
 
+let stopping = false;
 try {
-  const deps = await server.deps();
-  const options = server.options();
-  const httpServer = await server.init(deps);
-  await server.listen(deps, httpServer, options);
+  const teardown = await app.init();
   process.on('SIGINT', () => {
-    deps.logger.info('caught SIGINT');
-    server
-      .teardown(deps, httpServer)
-      .then(() => {
-        process.exit(0);
-      })
-      .catch((err) => {
-        console.error(err);
-        process.exit(-1);
-      });
+    if (!stopping) {
+      stopping = true;
+      teardown().then(() => process.exit(0));
+    }
   });
 } catch (error) {
   console.error(error);
