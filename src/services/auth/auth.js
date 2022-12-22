@@ -1,8 +1,9 @@
+/** @typedef {import('./auth').init} init */
 import * as crypto from '../../lib/crypto.js';
 import { AppError } from '../../lib/error.js';
 
-/** @type function(Pick<Services['infrastructure'], 'db'>): Services['application']['auth']  */
-export const init = ({ db }) => ({
+/** @type init  */
+export const init = async ({ db, bus }) => ({
   signUp: async ({ email, password, ...rest }) => {
     const exists = await db.user.findUnique({ where: { email } });
     if (exists) throw new AppError('Already exists');
@@ -15,6 +16,8 @@ export const init = ({ db }) => ({
 
     const token = crypto.random();
     await db.session.create({ data: { userId, token } });
+
+    bus.publish('signUp', { email });
 
     return { userId, token };
   },

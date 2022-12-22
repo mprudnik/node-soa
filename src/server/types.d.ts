@@ -1,0 +1,23 @@
+import type { FastifyInstance, FastifyServerOptions } from 'fastify';
+import type { FastifyCorsOptions } from '@fastify/cors'
+import type { HttpRouter } from '../api/types';
+import type { Infra } from '../infra/types';
+
+export type ServerConfig = {
+  host: string;
+  port: number;
+  instance: FastifyServerOptions;
+  cors: FastifyCorsOptions;
+  swagger: {
+    title: string;
+    version: string;
+    routePrefix: string;
+    serverUrl: string;
+  }
+};
+
+export function init(
+  router: HttpRouter,
+  infra: Infra,
+  config: ServerConfig
+): Promise<FastifyInstance>;

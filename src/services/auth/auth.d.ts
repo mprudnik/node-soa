@@ -1,4 +1,6 @@
-export type Auth = {
+import type { Infra } from '../../infra/types';
+
+interface Auth {
   signUp(params: {
     email: string;
     password: string;
@@ -13,5 +15,4 @@ export type Auth = {
   refresh(params: { token: string; }): Promise<{ token: string }>;
 }
 
-export type Deps = { infrastructure: Services['infrastructure'] };
-export function init(deps: Deps): Promise<Auth>;
+export function init(infra: Infra): Promise<Auth>;
