@@ -3,7 +3,7 @@ import * as crypto from '../../lib/crypto.js';
 import { AppError } from '../../lib/error.js';
 
 /** @type init  */
-export const init = async ({ db, bus }) => ({
+export const init = ({ db, bus }) => ({
   signUp: async ({ email, password, ...rest }) => {
     const exists = await db.user.findUnique({ where: { email } });
     if (exists) throw new AppError('Already exists');

@@ -15,4 +15,4 @@ interface Auth {
   refresh(params: { token: string; }): Promise<{ token: string }>;
 }
 
-export function init(infra: Infra): Promise<Auth>;
+export function init(infra: Infra): Auth;

@@ -36,7 +36,6 @@ model Session {
 model Account {
   id        String   @id @default(uuid())
   balance   Float
-  currency  Currency
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -48,8 +47,8 @@ model Account {
 
 model Transaction {
   id        String           @id @default(uuid())
+  type      TransactionType
   amount    Float
-  currency  Currency
   state     TransactionState @default(INITIAL)
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
@@ -60,15 +59,15 @@ model Transaction {
   toId   String
 }
 
+enum TransactionType {
+  TRANSFER
+  WITHDRAW
+  DEPOSIT
+}
+
 enum TransactionState {
   INITIAL
   DEBITED
   COMPLETED
   FAILED
-}
-
-enum Currency {
-  USD
-  EUR
-  UAH
 }
