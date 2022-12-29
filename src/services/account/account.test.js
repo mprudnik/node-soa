@@ -3,9 +3,9 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import * as account from './account.js';
 
-describe('Account service', () => {
-  it('transfers the money', async () => {
-    const db = getDB();
+describe('account/transfer', () => {
+  it('works', async () => {
+    const db = getDb();
     const bus = getBus();
     const service = account.init({ db, bus });
 
@@ -31,19 +31,19 @@ describe('Account service', () => {
 
   const ledgerId = '1';
   const transactionId = '1';
-  const getDB = () => ({
+  const getDb = () => ({
     ledger: {
       invokedWith: null,
       findFirst({ where }) {
         this.invokedWith = where;
-        return { id: ledgerId };
+        return Promise.resolve({ id: ledgerId });
       },
     },
     transaction: {
       invokedWith: null,
       create({ data }) {
         this.invokedWith = data;
-        return { id: transactionId };
+        return Promise.resolve({ id: transactionId });
       },
     },
   });
