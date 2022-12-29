@@ -19,7 +19,7 @@ const transfer = {
       properties: { transactionId: { type: 'string' } },
     },
   },
-  command: 'wallet.transfert',
+  command: 'account.transfert',
 };
 
-export const wallet = [transfer];
+export const account = [transfer];

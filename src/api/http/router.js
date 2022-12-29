@@ -1,4 +1,4 @@
 import { auth } from './auth.js';
-import { wallet } from './wallet';
+import { account } from './account.js';
 
-export const http = { auth, wallet };
+export const http = { auth, account };
