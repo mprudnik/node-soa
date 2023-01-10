@@ -47,8 +47,6 @@ model Account {
 model AccountStatement {
   date    DateTime @db.Date
   balance Float
-  credit  Float
-  debit   Float
 
   account   Account @relation(fields: [accountId], references: [id])
   accountId String

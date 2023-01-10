@@ -13,6 +13,8 @@ interface Account {
     toId: AccountModel['id'],
     amount: AccountTransactionModel['amount'],
   ): Promise<void>;
+  getBalance(accountId: AccountModel['id']): Promise<number>;
+  getTransactions(accountId: AccountModel['id']): Promise<AccountTransactionModel[]>;
 }
 
 export function getBalance(

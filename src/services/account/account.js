@@ -98,6 +98,8 @@ export const init = ({ db, bus }) => ({
       state: 'completed',
     });
   },
+  getBalance: (accountId) => getBalance(db, accountId),
+  getTransactions: (accountId) => db.accountTransaction.findMany({ where: { accountId } }),
 });
 
 /** @type AccountService['getBalance'] */
@@ -123,7 +125,7 @@ const getBalance = async (db, accountId) => {
   const debit = debitSum.amount ?? 0;
   const credit = creditSum.amount ?? 0;
   const balance = statement
-    ? statement.balance + (credit - debit)
-    : credit - debit;
+    ? statement.balance + (debit - credit)
+    : debit - credit;
   return balance;
 };
