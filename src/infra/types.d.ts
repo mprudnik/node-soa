@@ -1,8 +1,9 @@
 import type { PrismaClient, Prisma } from '@prisma/client';
 import { BaseLogger } from 'pino';
 
+type Event = Record<string, any>;
 interface EventHandler {
-  (event: object): any;
+  (event: Event): any;
 }
 
 export type Logger = Pick<BaseLogger, 'silent' | 'trace' | 'level' | 'debug' | 'info' | 'warn' | 'error' | 'fatal'>;
@@ -12,12 +13,21 @@ export interface Bus {
   registerService(name: string, service: object): void;
 
   subscribe(eventName: string, handler: EventHandler): boolean;
-  publish(eventName: string, event: object): boolean;
+  publish(eventName: string, event: Event): boolean;
+}
+
+type WSMessage = Record<string, any>;
+export interface WS {
+  has(id: string): boolean;
+  add(id: string, socket: any): void;
+  remove(id: string): void;
+  send(id: string, data: WSMessage): void;
 }
 export type Infra = {
   bus: Bus;
   logger: Logger;
   db: DB;
+  ws: WS;
 };
 
 export type LoggerConfig = { env: string };
