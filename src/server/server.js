@@ -2,6 +2,7 @@
 import { fastify } from 'fastify';
 import { cors } from './plugins/cors.js';
 import { swagger } from './plugins/swagger.js';
+import { websocket } from './plugins/websocket.js';
 import { handleError } from '../lib/error.js';
 
 const objectProps = { type: 'object', additionalProperties: false };
@@ -30,13 +31,14 @@ const generateSchema = (prefix, definition) => {
 
 /** @type init */
 export const init = async (router, infra, config) => {
-  const { db, logger, bus } = infra;
+  const { db, logger, bus, ws } = infra;
   const { host, port, instance } = config;
 
   const server = fastify({ logger, ...instance });
 
   await server.register(cors(config.cors));
   await server.register(swagger(config.swagger));
+  await server.register(websocket({}));
 
   server.setErrorHandler(server.errorHandler);
   server.setErrorHandler((error, req, res) => {
@@ -76,6 +78,22 @@ export const init = async (router, infra, config) => {
       });
     }
   }
+
+  server.route({
+    method: 'GET',
+    url: '/ws',
+    websocket: true,
+    handler: async () => 'WS',
+    wsHandler: (connection, req) => {
+      const { id: userId } = req.user;
+      connection.socket.on('open', () => {
+        ws.add(userId, connection.socket);
+      });
+      connection.socket.on('close', () => {
+        ws.remove(userId);
+      });
+    },
+  });
 
   await server.listen({ host, port });
 

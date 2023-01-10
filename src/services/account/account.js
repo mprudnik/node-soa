@@ -99,7 +99,8 @@ export const init = ({ db, bus }) => ({
     });
   },
   getBalance: (accountId) => getBalance(db, accountId),
-  getTransactions: (accountId) => db.accountTransaction.findMany({ where: { accountId } }),
+  getTransactions: (accountId) =>
+    db.accountTransaction.findMany({ where: { accountId } }),
 });
 
 /** @type AccountService['getBalance'] */
