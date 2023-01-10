@@ -1,8 +1,23 @@
 import type { Infra } from '../../infra/types';
-import type { Transaction } from '@prisma/client';
+import type {
+  Prisma,
+  Account as AccountModel,
+  AccountTransaction as AccountTransactionModel,
+} from '@prisma/client';
 
-interface Wallet {
-  transfer(params: Pick<Transaction, 'fromId' | 'toId' | 'amount'>): Promise<{ transactionId: string; }>;
+interface Account {
+  deposit(accountId: AccountModel['id'], amount: AccountTransactionModel['amount']): Promise<void>;
+  withdraw(accountId: AccountModel['id'], amount: AccountTransactionModel['amount']): Promise<void>;
+  transfer(
+    fromId: AccountModel['id'],
+    toId: AccountModel['id'],
+    amount: AccountTransactionModel['amount'],
+  ): Promise<void>;
 }
 
-export function init(infra: Infra): Wallet;
+export function getBalance(
+  db: Infra['db'] | Prisma.TransactionClient,
+  accountId: AccountModel['id'],
+): Promise<number>
+
+export function init(infra: Infra): Account;

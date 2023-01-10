@@ -34,21 +34,14 @@ model Session {
 }
 
 model Account {
-  id        String      @id @default(uuid())
-  type      AccountType
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  owner      User               @relation(fields: [userId], references: [id])
-  userId     String
-  statements AccountStatement[]
-  debits     Transaction[]      @relation(name: "debit")
-  credit     Transaction[]      @relation(name: "credit")
-}
-
-enum AccountType {
-  internal
-  external
+  owner        User                 @relation(fields: [userId], references: [id])
+  userId       String
+  statements   AccountStatement[]
+  transactions AccountTransaction[]
 }
 
 model AccountStatement {
@@ -64,22 +57,66 @@ model AccountStatement {
 }
 
 model Ledger {
-  id      String    @id @default(uuid())
-  date    DateTime? @unique @db.Date
-  balance Float
+  id   String     @id @default(uuid())
+  type LedgerType
+  name String     @unique
 
-  transactions Transaction[]
+  statements   LedgerStatement[]
+  credits      LedgerTransaction[]  @relation(name: "credit")
+  debits       LedgerTransaction[]  @relation(name: "debit")
+  transactions AccountTransaction[]
 }
 
-model Transaction {
-  id     String   @id @default(uuid())
-  date   DateTime @default(now())
-  amount Float
+enum LedgerType {
+  asset
+  liability
+  revenue
+  expense
+  gain
+  loss
+}
 
-  ledger   Ledger  @relation(fields: [ledgerId], references: [id])
+model LedgerStatement {
+  date    DateTime @default(now()) @db.Date
+  balance Float
+
+  ledger   Ledger @relation(fields: [ledgerId], references: [id])
   ledgerId String
-  to       Account @relation(name: "debit", fields: [toId], references: [id])
-  toId     String
-  from     Account @relation(name: "credit", fields: [fromId], references: [id])
-  fromId   String
+
+  @@id([ledgerId, date])
+}
+
+model LedgerTransaction {
+  id     String   @id @default(uuid())
+  amount Float
+  date   DateTime @default(now())
+
+  from   Ledger @relation(name: "credit", fields: [fromId], references: [id])
+  fromId String
+  to     Ledger @relation(name: "debit", fields: [toId], references: [id])
+  toId   String
+}
+
+model AccountTransaction {
+  id           String                         @id @default(uuid())
+  date         DateTime                       @default(now())
+  amount       Float
+  typeInternal AccountTransactionTypeInternal
+  typeExternal AccountTransactionTypeExternal
+
+  ledger    Ledger  @relation(fields: [ledgerId], references: [id])
+  ledgerId  String
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId String
+}
+
+enum AccountTransactionTypeInternal {
+  credit
+  debit
+}
+
+enum AccountTransactionTypeExternal {
+  deposit
+  withdrawal
+  bankFee
 }
