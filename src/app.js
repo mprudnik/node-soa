@@ -9,7 +9,7 @@ export const init = async () => {
 
   await services.init(infrastructure);
 
-  const serviceInstance = await server.init(
+  const serverInstance = await server.init(
     router.http,
     infrastructure,
     config.server,
@@ -17,7 +17,7 @@ export const init = async () => {
 
   return async () => {
     infrastructure.logger.info('Stopping application');
-    await serviceInstance.close();
+    await serverInstance.close();
     await infra.teardown(infrastructure);
   };
 };

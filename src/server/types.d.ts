@@ -21,3 +21,4 @@ export function init(
   infra: Infra,
   config: ServerConfig
 ): Promise<FastifyInstance>;
+
