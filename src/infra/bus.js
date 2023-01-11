@@ -11,10 +11,10 @@ export class Bus {
     this.#services = new Map();
   }
 
-  command(name, payload) {
+  command(name, payload, session) {
     const [serviceName, methodName] = name.split('.');
     const service = this.#services.get(serviceName);
-    return service[methodName](payload);
+    return service[methodName](payload, session);
   }
 
   registerService(name, service) {

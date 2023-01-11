@@ -1,5 +1,6 @@
 import type { PrismaClient, Prisma } from '@prisma/client';
 import { BaseLogger } from 'pino';
+import { Session } from '../types';
 
 type Event = Record<string, any>;
 interface EventHandler {
@@ -9,7 +10,7 @@ interface EventHandler {
 export type Logger = Pick<BaseLogger, 'silent' | 'trace' | 'level' | 'debug' | 'info' | 'warn' | 'error' | 'fatal'>;
 export type DB = PrismaClient;
 export interface Bus {
-  command(commandName: string, payload: object): Promise<object>;
+  command(commandName: string, payload: object, session?: Session): Promise<any>;
   registerService(name: string, service: object): void;
 
   subscribe(eventName: string, handler: EventHandler): boolean;

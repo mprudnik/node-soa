@@ -1,7 +1,8 @@
-import type { FastifyInstance, FastifyServerOptions } from 'fastify';
+import type { FastifyInstance,  FastifyServerOptions } from 'fastify';
 import type { FastifyCorsOptions } from '@fastify/cors'
 import type { HttpRouter } from '../api/types';
 import type { Infra } from '../infra/types';
+import type { Session } from '../types';
 
 export type ServerConfig = {
   host: string;
@@ -21,4 +22,14 @@ export function init(
   infra: Infra,
   config: ServerConfig
 ): Promise<FastifyInstance>;
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    getAuthToken: (req: FastifyRequest) => string;
+  }
+
+  interface FastifyRequest {
+    session: Session;
+  }
+}
 

@@ -6,6 +6,7 @@ type HttpSchema = { source?: HttpDataSource, input?: ValidationSchema, output?: 
 export type HttpRoute = {
   method: HttpMethod;
   url: string;
+  auth?: object;
   schema: HttpSchema;
   command: string;
 }

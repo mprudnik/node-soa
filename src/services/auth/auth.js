@@ -55,4 +55,11 @@ export const init = ({ db, bus }) => ({
 
     return { token: newToken };
   },
+
+  verify: async ({ token }) => {
+    const session = await db.session.findUnique({ where: { token } });
+    if (!session) throw new AppError('Not found');
+
+    return { userId: session.userId };
+  },
 });

@@ -1,4 +1,5 @@
 import type { Infra } from '../../infra/types';
+import type { Session } from '../../types';
 
 interface Auth {
   signUp(params: {
@@ -13,6 +14,7 @@ interface Auth {
   }): Promise<{ userId: string; token: string; }>;
   signOut(params: { token: string; }): Promise<void>;
   refresh(params: { token: string; }): Promise<{ token: string }>;
+  verify(params: { token: string; }): Promise<Session>;
 }
 
 export function init(infra: Infra): Auth;

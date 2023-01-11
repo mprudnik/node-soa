@@ -1,5 +1,7 @@
 /** @typedef {import('./types').init} init */
+/** @typedef {import('../types').Session} Session */
 import { fastify } from 'fastify';
+import { auth } from './plugins/auth.js';
 import { cors } from './plugins/cors.js';
 import { swagger } from './plugins/swagger.js';
 import { websocket } from './plugins/websocket.js';
@@ -22,7 +24,7 @@ const generateSchema = (prefix, definition) => {
     schema.response = {
       200: { ...objectProps, ...definition.output },
       400: { description: 'Client error', ...errorResponse },
-      //401: { description: 'Auth error', errorResponse },
+      401: { description: 'Auth error', ...errorResponse },
     };
   }
 
@@ -39,6 +41,7 @@ export const init = async (router, infra, config) => {
   await server.register(cors(config.cors));
   await server.register(swagger(config.swagger));
   await server.register(websocket({}));
+  await server.register(auth({}));
 
   server.setErrorHandler(server.errorHandler);
   server.setErrorHandler((error, req, res) => {
@@ -62,20 +65,47 @@ export const init = async (router, infra, config) => {
 
   for (const [prefix, routes] of Object.entries(router)) {
     for (const route of routes) {
-      const { method, url, schema: schemaDefinition, command } = route;
+      const {
+        method,
+        url,
+        schema: schemaDefinition,
+        auth: authDefinition,
+        command,
+      } = route;
+
       const schema = generateSchema(prefix, schemaDefinition);
-      server.route({
+
+      const routeDefinition = {
         method,
         url: `/${prefix}${url}`,
         schema,
         handler: async (req, res) => {
           /** @type object */
-          const payload = schema.source ? req[schema.source] : {};
-          const result = await bus.command(command, payload);
+          const payload = schemaDefinition.source
+            ? req[schemaDefinition.source]
+            : {};
+          const session = authDefinition ? req.session : undefined;
+          const result = await bus.command(command, payload, session);
           const [code, data] = schema.output ? [200, result] : [204, null];
           res.code(code).send(data);
         },
-      });
+      };
+
+      if (authDefinition) {
+        routeDefinition.onRequest = server.auth([
+          async (req) => {
+            const token = server.getAuthToken(req);
+            /** @type Session */
+            const session = await bus.command('auth.verify', {
+              token,
+              definition: authDefinition,
+            });
+            req.session = session;
+          },
+        ]);
+      }
+
+      server.route(routeDefinition);
     }
   }
 
@@ -83,9 +113,17 @@ export const init = async (router, infra, config) => {
     method: 'GET',
     url: '/ws',
     websocket: true,
+    onRequest: server.auth([
+      async (req) => {
+        const token = server.getAuthToken(req);
+        /** @type Session */
+        const session = await bus.command('auth.verify', { token });
+        req.session = session;
+      },
+    ]),
     handler: async () => 'WS',
     wsHandler: (connection, req) => {
-      const { id: userId } = req.user;
+      const { userId } = req.session;
       connection.socket.on('open', () => {
         ws.add(userId, connection.socket);
       });
