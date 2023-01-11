@@ -6,6 +6,7 @@ import { cors } from './plugins/cors.js';
 import { swagger } from './plugins/swagger.js';
 import { websocket } from './plugins/websocket.js';
 import { handleError } from '../lib/error.js';
+import { randomUUID } from 'crypto';
 
 const objectProps = { type: 'object', additionalProperties: false };
 const errorResponse = {
@@ -33,10 +34,13 @@ const generateSchema = (prefix, definition) => {
 
 /** @type init */
 export const init = async (router, infra, config) => {
-  const { db, logger, bus, ws } = infra;
+  const { db, logger, bus } = infra;
   const { host, port, instance } = config;
 
   const server = fastify({ logger, ...instance });
+  // decoreate a server with metadata - serverId
+  server.serverId = randomUUID();
+  server.wsConnections = new Map();
 
   await server.register(cors(config.cors));
   await server.register(swagger(config.swagger));
@@ -64,6 +68,7 @@ export const init = async (router, infra, config) => {
   });
 
   for (const [prefix, routes] of Object.entries(router)) {
+    // For fastifyRoute initialization better to have this done seperately
     for (const route of routes) {
       const {
         method,
@@ -84,13 +89,16 @@ export const init = async (router, infra, config) => {
           const payload = schemaDefinition.source
             ? req[schemaDefinition.source]
             : {};
-          const session = authDefinition ? req.session : undefined;
+          const session = authDefinition // use AsyncLocalStorage
+            ? req.session
+            : undefined;
           const result = await bus.command(command, payload, session);
           const [code, data] = schema.output ? [200, result] : [204, null];
           res.code(code).send(data);
         },
       };
 
+      // Try do move this as a hook
       if (authDefinition) {
         routeDefinition.onRequest = server.auth([
           async (req) => {
@@ -100,6 +108,7 @@ export const init = async (router, infra, config) => {
               token,
               definition: authDefinition,
             });
+            // use AsyncLocalStorage
             req.session = session;
           },
         ]);
@@ -118,17 +127,39 @@ export const init = async (router, infra, config) => {
         const token = server.getAuthToken(req);
         /** @type Session */
         const session = await bus.command('auth.verify', { token });
+        // use AsyncLocalStorage
         req.session = session;
       },
     ]),
     handler: async () => 'WS',
     wsHandler: (connection, req) => {
-      const { userId } = req.session;
+      const { userId } = req.session; // use AsyncLocalStorage
+      const { serverId } = server;
+      const wsId = randomUUID();
       connection.socket.on('open', () => {
-        ws.add(userId, connection.socket);
+        server.wsConnections.set(wsId, connection);
+        bus.publish('notification.init.event', {
+          metadata: { wsId, serverId },
+          data: { userId },
+        });
+        bus.subscribe(
+          `notification.message.${serverId}`,
+          ({ metadata, data }) => {
+            const { wsId } = metadata;
+            const connection = server.wsConnections.get(wsId);
+            connection.socket.send(JSON.stringify({ data }));
+          },
+        );
+        // ws.add(userId, connection.socket);
       });
       connection.socket.on('close', () => {
-        ws.remove(userId);
+        server.wsConnections.delete(wsId);
+        bus.publish('notification.close.event', {
+          metadata: { wsId, serverId },
+          data: { userId },
+        });
+        bus.unsubcribe(`notification.message.${serverId}`);
+        // ws.remove(userId);
       });
     },
   });

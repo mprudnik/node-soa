@@ -24,6 +24,9 @@ const signUp = {
     },
   },
   command: 'auth.signUp',
+  hooks: {
+    before: 'authCheckHook',
+  },
 };
 
 /** @type HttpRoute */

@@ -3,6 +3,7 @@ import { AppError } from '../../lib/error';
 
 /** @type Notification['init'] */
 export const init = ({ bus, db, ws }) => {
+  const initializedUsers = new Map();
   bus.subscribe('account.transfer', async ({ fromId, toId, amount, state }) => {
     if (state !== 'completed') return;
 
