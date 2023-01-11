@@ -3,7 +3,7 @@ import { AppError } from '../../lib/error.js';
 
 /** @type AccountService['init'] */
 export const init = ({ db, bus }) => ({
-  deposit: async (accountId, amount) => {
+  deposit: async ({ accountId, amount }) => {
     const ledger = await db.ledger.findUnique({ where: { name: 'HouseCash' } });
     if (!ledger) throw new AppError('Transaction failed');
 
@@ -18,7 +18,7 @@ export const init = ({ db, bus }) => ({
     });
     bus.publish('account.deposit', { accountId, amount });
   },
-  withdraw: async (accountId, amount) => {
+  withdraw: async ({ accountId, amount }) => {
     const ledger = await db.ledger.findUnique({ where: { name: 'HouseCash' } });
     if (!ledger) throw new AppError('Transaction failed');
 
@@ -38,7 +38,7 @@ export const init = ({ db, bus }) => ({
     });
     bus.publish('account.withdraw', { accountId, amount });
   },
-  transfer: async (fromId, toId, amount) => {
+  transfer: async ({ fromId, toId, amount }) => {
     const reserveLedger = await db.ledger.findUnique({
       where: { name: 'HouseReserve' },
     });
@@ -98,8 +98,8 @@ export const init = ({ db, bus }) => ({
       state: 'completed',
     });
   },
-  getBalance: (accountId) => getBalance(db, accountId),
-  getTransactions: (accountId) =>
+  getBalance: ({ accountId }) => getBalance(db, accountId),
+  getTransactions: ({ accountId }) =>
     db.accountTransaction.findMany({ where: { accountId } }),
 });
 

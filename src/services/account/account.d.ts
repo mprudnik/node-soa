@@ -6,15 +6,25 @@ import type {
 } from '@prisma/client';
 
 interface Account {
-  deposit(accountId: AccountModel['id'], amount: AccountTransactionModel['amount']): Promise<void>;
-  withdraw(accountId: AccountModel['id'], amount: AccountTransactionModel['amount']): Promise<void>;
-  transfer(
+  deposit(params: {
+    accountId: AccountModel['id'],
+    amount: AccountTransactionModel['amount'],
+  }): Promise<void>;
+  withdraw(params: {
+    accountId: AccountModel['id'],
+    amount: AccountTransactionModel['amount'],
+  }): Promise<void>;
+  transfer(params: {
     fromId: AccountModel['id'],
     toId: AccountModel['id'],
     amount: AccountTransactionModel['amount'],
-  ): Promise<void>;
-  getBalance(accountId: AccountModel['id']): Promise<number>;
-  getTransactions(accountId: AccountModel['id']): Promise<AccountTransactionModel[]>;
+  }): Promise<void>;
+  getBalance(params: {
+    accountId: AccountModel['id'],
+  }): Promise<number>;
+  getTransactions(params: {
+    accountId: AccountModel['id'],
+  }): Promise<AccountTransactionModel[]>;
 }
 
 export function getBalance(

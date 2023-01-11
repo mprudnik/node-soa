@@ -73,11 +73,13 @@ describe('account', () => {
 
   it('deposits', async () => {
     const amount = 50;
-    await service.deposit(account1.id, amount);
+    await service.deposit({ accountId: account1.id, amount });
 
-    const currentBalance = await service.getBalance(account1.id);
+    const currentBalance = await service.getBalance({ accountId: account1.id });
     assert.equal(currentBalance, account1.initialBalance + amount);
-    const transactions = await service.getTransactions(account1.id);
+    const transactions = await service.getTransactions({
+      accountId: account1.id,
+    });
     assert.equal(transactions.length, 1);
     const tx = transactions[0];
     assert.equal(tx.amount, amount);
@@ -87,11 +89,13 @@ describe('account', () => {
 
   it('withdraws', async () => {
     const amount = 100;
-    await service.withdraw(account1.id, amount);
+    await service.withdraw({ accountId: account1.id, amount });
 
-    const currentBalance = await service.getBalance(account1.id);
+    const currentBalance = await service.getBalance({ accountId: account1.id });
     assert.equal(currentBalance, account1.initialBalance - amount);
-    const transactions = await service.getTransactions(account1.id);
+    const transactions = await service.getTransactions({
+      accountId: account1.id,
+    });
     assert.equal(transactions.length, 1);
     const tx = transactions[0];
     assert.equal(tx.amount, amount);
@@ -101,19 +105,27 @@ describe('account', () => {
 
   it('transfers', async () => {
     const amount = 200;
-    await service.transfer(account1.id, account2.id, amount);
+    await service.transfer({ fromId: account1.id, toId: account2.id, amount });
 
-    const currentBalance1 = await service.getBalance(account1.id);
-    const currentBalance2 = await service.getBalance(account2.id);
+    const currentBalance1 = await service.getBalance({
+      accountId: account1.id,
+    });
+    const currentBalance2 = await service.getBalance({
+      accountId: account2.id,
+    });
     assert.equal(currentBalance1, account1.initialBalance - amount);
     assert.equal(currentBalance2, account2.initialBalance + amount);
-    const transactions1 = await service.getTransactions(account1.id);
+    const transactions1 = await service.getTransactions({
+      accountId: account1.id,
+    });
     assert.equal(transactions1.length, 1);
     const tx1 = transactions1[0];
     assert.equal(tx1.amount, amount);
     assert.equal(tx1.accountId, account1.id);
     assert.equal(tx1.typeExternal, 'withdrawal');
-    const transactions2 = await service.getTransactions(account2.id);
+    const transactions2 = await service.getTransactions({
+      accountId: account2.id,
+    });
     assert.equal(transactions2.length, 1);
     const tx2 = transactions2[0];
     assert.equal(tx2.amount, amount);
