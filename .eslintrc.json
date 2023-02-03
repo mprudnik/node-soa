@@ -6,7 +6,8 @@
     "node": true
   },
   "rules": {
-    "strict": "off"
+    "strict": "off",
+    "no-use-before-define": "off"
   },
   "parserOptions": {
     "sourceType": "module",

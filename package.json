@@ -5,9 +5,10 @@
   "type": "module",
   "main": "main.js",
   "scripts": {
-    "check": "npx tsc --project .",
+    "check": "eslint . && tsc --project .",
     "start": "node main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "prisma generate",
+    "test": "node --test"
   },
   "repository": {
     "type": "git",
@@ -22,17 +23,30 @@
   "engines": {
     "node": "18"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@fastify/auth": "^4.2.0",
+    "@fastify/cors": "^8.2.0",
+    "@fastify/swagger": "^8.2.1",
+    "@fastify/swagger-ui": "^1.3.0",
+    "@fastify/websocket": "^7.1.2",
+    "@prisma/client": "^4.8.1",
+    "fastify": "^4.10.2",
+    "fastify-plugin": "^4.4.0",
+    "pino": "^8.7.0"
+  },
   "devDependencies": {
+    "@fastify/type-provider-json-schema-to-ts": "^2.2.1",
     "@types/node": "^18.7.8",
-    "@types/ws": "^8.5.3",
+    "@types/ws": "^8.5.4",
     "eslint": "^8.22.0",
     "eslint-config-metarhia": "^8.1.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "metatests": "^0.8.2",
+    "pino-pretty": "^9.1.1",
     "prettier": "^2.7.1",
+    "prisma": "^4.8.1",
     "typescript": "^4.7.4"
   }
 }
